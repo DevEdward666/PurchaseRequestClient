@@ -252,7 +252,11 @@ export const action_INSERT_notications =
 
 export const signalr_connection_notify = () => async (dispatch) => {
   const hubConnect = new signalR.HubConnectionBuilder()
-    .withUrl(`${process.env.REACT_APP_BASE_URL}notify`)
+    .withUrl(`${process.env.REACT_APP_BASE_URL}api/notif/notify`, {
+      skipNegotiation: true,
+      transport: signalR.HttpTransportType.WebSockets,
+    })
+
     .build();
   hubConnect.start();
   dispatch({ type: SIGNALR_CONNECT_NOTIFY, payload: hubConnect });

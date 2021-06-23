@@ -57,6 +57,7 @@ const useStyles = makeStyles((theme) => ({
     selectEmpty: {
       marginTop: theme.spacing(2),
     },
+    RoundedButton: { borderRadius: 50 }
   }));
 
   export default useStyles

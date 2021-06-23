@@ -51,13 +51,13 @@ const DashboardTable = () => {
         }
         mounted && buttonclick()
         return()=>{mounted=false}
-    },[])
+    },[dispatch])
     useEffect(()=>{
         let mounted =true;
         const index =()=>{
             if(mounted){
             
-                if(status!==" "){
+                if(status!==""){
                     dispatch(action_GET_listofrequest_by_status(user_info?.deptcode,status))
                 }else{
                     dispatch(action_GET_listofrequest_by_status(user_info?.deptcode,"For Approval"))
@@ -69,6 +69,7 @@ const DashboardTable = () => {
         mounted && index()
         return ()=>{mounted=false}
     },[ dispatch, status, user_info?.deptcode])
+
     const TablePaginationActions =(props) =>{
         const classes = useStyles();
         const theme = useTheme();
@@ -127,7 +128,7 @@ const DashboardTable = () => {
           rowsPerPage: PropTypes.number.isRequired,
         };
         const columns = [
-            { id: 'reqno', label: 'Request No.', minWidth: 170,  align: 'left', },
+            { id: 'reqno', label: 'Purchase Request No.', minWidth: 170,  align: 'left', },
             { id: 'deptname', label: 'Department', minWidth: 170,  align: 'left', },
             {
               id: 'reqdate',
@@ -154,13 +155,13 @@ const DashboardTable = () => {
                 align: 'left',
               },
           ];
-        function createData( reqno, deptname, reqdate, apprbyname,apprdate,STATUS) {
-          return { reqno, deptname, reqdate, apprbyname,apprdate,STATUS};
+        function createData( prno, deptname, reqdate, apprbyname,apprdate,STATUS) {
+          return { prno, deptname, reqdate, apprbyname,apprdate,STATUS};
         }
         
         const rows = data?.data.map((row) =>
         createData(
-          row.reqno,
+          row.prno,
           row.deptname,
           row.reqdate,
           row.apprbyname,
@@ -204,9 +205,9 @@ const DashboardTable = () => {
             ? rows.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
             : rows
           ).map((row) => (
-            <TableRow key={row.reqno} onClick={()=>handleRowClick(row)}>
+            <TableRow key={row.prno} onClick={()=>handleRowClick(row)}>
               <TableCell style={{ width: "10%" }} align="left">
-                {row.reqno}
+                {row.prno}
               </TableCell>
               <TableCell style={{ width: "20%" }} align="left">
                 {row.deptname}

@@ -31,6 +31,9 @@ import {
   action_close_success_modal,
   action_SET_updaterequestApproved,
   action_SET_updaterequestCancelled,
+  action_set_addnewsupplieropenmodal,
+  action_GET_InsertNewRequestWithoutSupplier,
+  action_GET_InsertSupplier
 } from "../../Services/Actions/Inventory_Actions";
 import { useDispatch, useSelector } from "react-redux";
 import CustomModal from "../../Plugin/Modal/CustomModal";
@@ -44,6 +47,9 @@ const GRheader = (props) => {
   const history = useHistory();
   const department = useSelector(
     (state) => state.Inventory_Reducers.department
+  );
+  const sections = useSelector(
+    (state) => state.Inventory_Reducers.sectionlist
   );
   const requesteddtls = useSelector(
     (state) => state.Inventory_Reducers.requesteddtls
@@ -61,6 +67,7 @@ const GRheader = (props) => {
   const reqremarks = useSelector(
     (state) => state.Inventory_Reducers.requestfooter
   );
+  const selectedsuppliers = useSelector(state => state.Inventory_Reducers.selectedsuppliers)
   const permissions = useSelector((state) => state.DefaultReducers.permissions);
   const [office, setoffice] = useState("");
   const [reqno, setreqno] = useState("");
@@ -86,8 +93,8 @@ const GRheader = (props) => {
         ) {
           sethideallactions(true);
 
-          setreqno(singlerequestheader?.data[0]?.reqno);
-          setoffice(singlerequestheader?.data[0]?.todept);
+          setreqno(singlerequestheader?.data[0]?.prno);
+          setoffice(singlerequestheader?.data[0]?.deptcode);
           setreqby(singlerequestheader?.data[0]?.reqby);
           setreqdate(singlerequestheader?.data[0]?.reqdate);
           setreqstatus(singlerequestheader?.data[0]?.reqstatus);
@@ -96,13 +103,13 @@ const GRheader = (props) => {
           );
         } else if (
           singlerequestheader?.loading &&
-          requestinfo?.data?.reqno !== undefined
+          requestinfo?.data?.prno !== undefined
         ) {
           sethideactions(true);
           setdeptSelectDisabled(true);
-          setreqno(singlerequestheader?.data[0]?.reqno);
-          setoffice(singlerequestheader?.data[0]?.todept);
-          setreqby(singlerequestheader?.data[0]?.reqby);
+          setreqno(singlerequestheader?.data[0]?.prno);
+          setoffice(singlerequestheader?.data[0]?.deptcode);
+          setreqby(singlerequestheader?.data.reqby);
           setreqdate(singlerequestheader?.data[0]?.reqdate);
           setreqstatus(singlerequestheader?.data[0]?.reqstatus);
           dispatch(
@@ -133,10 +140,12 @@ const GRheader = (props) => {
     };
   }, [
     dispatch,
+    permissions?.approve,
+    permissions?.cancel,
     reqstatus,
     requestinfo,
     singlerequestheader,
-    singlerequestheader?.data.reqno,
+    singlerequestheader?.data[0]?.prno,
     singlerequestheader?.loading,
   ]);
   const handleChange = useCallback(
@@ -180,26 +189,68 @@ const GRheader = (props) => {
       mounted = false;
     };
   }, [dispatch]);
-  const handleSubmitRequest = useCallback(async () => {
+  const handleNewSupplierClick = useCallback(() => {
     let mounted = true;
     if (mounted) {
-      if (requesteddtls !== [])
-        await dispatch(
-          action_GET_InsertNewRequest(
-            user_info?.deptcode,
-            reqby,
-            office,
-            reqremarks,
-            requesteddtls
-          )
-        );
+      dispatch(action_set_addnewsupplieropenmodal(true));
     }
 
     return () => {
       mounted = false;
     };
-  }, [dispatch, office, reqby, reqremarks, requesteddtls, user_info?.deptcode]);
+  }, [dispatch]);
+  const handleAddSupplierClick = useCallback(() => {
+    let mounted = true;
+    if (mounted) {
+      dispatch(action_set_addnewsupplieropenmodal(true));
+    }
 
+    return () => {
+      mounted = false;
+    };
+  }, [dispatch]);
+  const handleSubmitRequest = useCallback(async () => {
+    let mounted = true;
+    if (mounted) {
+      if (requesteddtls !== []){
+        if(selectedsuppliers?.data.length >0 ){
+          await dispatch(
+           action_GET_InsertNewRequest(office, reqby, reqremarks, requesteddtls,selectedsuppliers.data)
+         );
+         console.log("im here")
+       }else{
+         await dispatch(
+           action_GET_InsertNewRequestWithoutSupplier(office, reqby, reqremarks, requesteddtls)
+         );
+         
+       }
+      }
+
+       
+    }
+
+    return () => {
+      mounted = false;
+    };
+  }, [dispatch, office, reqby, reqremarks, requesteddtls, selectedsuppliers]);
+  const handleAddSupplierSubmit = useCallback(async () => {
+    let mounted = true;
+    if (mounted) {
+        if(singlerequestheader?.data[0].prno !==[] ){
+          await dispatch(
+            action_GET_InsertSupplier(singlerequestheader?.data[0].prno ,selectedsuppliers.data)
+         );
+           }
+      
+
+       
+    }
+
+    return () => {
+      mounted = false;
+    };
+  }, [dispatch, selectedsuppliers.data, singlerequestheader?.data]);
+console.log(selectedsuppliers?.data)
   useEffect(() => {
     let mounted = true;
     const successgetter = async () => {
@@ -218,7 +269,7 @@ const GRheader = (props) => {
         if (requestsuccess?.message !== "")
           dispatch(
             action_INSERT_notications(
-              "New Item Request",
+              "New Purchase Item Request",
               requestsuccess?.message,
               "info",
               office,
@@ -342,9 +393,29 @@ const GRheader = (props) => {
       <Paper className={classes.buttonstyle}>
         <div style={{ display: "flex" }}>
           {hideallactions ? null : hideactions ? (
+            <>
+                 <div style={{ marginRight: "auto" }}>
+            <Button
+              className={classes.RoundedButton}
+            variant="contained"
+            color="primary"
+            onClick={() => handleAddSupplierClick()}
+          >
+            Add Supplier
+          </Button>
+          <Button
+           className={classes.RoundedButton}
+              variant="contained"
+              color="primary"
+              onClick={() => handleAddSupplierSubmit()}
+            >
+              Submit
+            </Button>
+          </div>
             <div style={{ marginLeft: "auto" }}>
               {canapprove ? (
                 <Button
+                className={classes.RoundedButton}
                   style={{ marginRight: 20 }}
                   variant="contained"
                   color="primary"
@@ -355,6 +426,7 @@ const GRheader = (props) => {
               ) : null}
               {cancancel ? (
                 <Button
+                className={classes.RoundedButton}
                   variant="contained"
                   color="secondary"
                   onClick={() => handleCancelRequest()}
@@ -363,9 +435,12 @@ const GRheader = (props) => {
                 </Button>
               ) : null}
             </div>
+            </>
           ) : (
             <>
+               <div style={{ marginRight: "auto" }}>
               <Button
+               className={classes.RoundedButton}
                 style={{ marginRight: "auto" }}
                 disabled={isDisabled}
                 variant="contained"
@@ -374,8 +449,18 @@ const GRheader = (props) => {
               >
                 Add Item
               </Button>
-
               <Button
+               className={classes.RoundedButton}
+                disabled={isDisabled}
+                variant="contained"
+                color="primary"
+                onClick={() => handleNewSupplierClick()}
+              >
+                Add Supplier
+              </Button>
+              </div>
+              <Button
+               className={classes.RoundedButton}
                 style={{ marginLeft: "auto" }}
                 disabled={isDisabled}
                 variant="contained"

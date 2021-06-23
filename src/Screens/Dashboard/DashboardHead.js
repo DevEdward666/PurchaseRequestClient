@@ -83,23 +83,7 @@ dispatch(action_set_status(value))
 
 
 
-             <Grid item xs={3} className={classes.mainGrid}>
-             <IconButton onClick={()=>handelSetStatus("Issued")}>
-             <Paper elevation={3} className={classes.paperstyle}>
-             <Grid container spacing={3}>
-             <div  className={classes.paperimage}>
-              <img src={issued} alt="Issued icon" width="50%"/>
-              </div>
-             <Grid item xs={12}>
-                <Typography  variant="h6" className={classes.paperTypo}>Issued</Typography> 
-            </Grid>
-            <Grid item xs={12}>
-                <Typography  variant="h6"  className={classes.paperTypoNumber}>{getdashboardnumbers?.data[0]?.issued}</Typography> 
-            </Grid>
-            </Grid>     
-             </Paper>
-             </IconButton>
-             </Grid>    
+   
         </div>
         <DashboardTable/>
         </div>

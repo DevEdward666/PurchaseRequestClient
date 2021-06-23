@@ -11,7 +11,7 @@ import {
   action_GET_defaultname,
 } from "../Services/Actions/Defaults_Actions";
 import { action_Login_user } from "../Services/Actions/Login_Actions";
-
+import { makeStyles } from "@material-ui/core/styles";
 const authFormValues = {
   username: "",
   password: "",
@@ -41,7 +41,12 @@ function Login() {
     dispatch(action_GET_defaultname());
     dispatch(action_GET_defaultlogo());
   }, [dispatch]);
+  const useStyles = makeStyles((theme) => ({
+  RoundedButton: { borderRadius: 50 }
+}));
+const classes = useStyles();
   return (
+    
     <div style={{ gridArea: "login" }} className="login-container">
       <section className="header">
         <img className="brand-logo" alt="" src={logo} />
@@ -84,7 +89,7 @@ function Login() {
             <Button
               type="submit"
               disabled={authLoading}
-              className="submit-btn"
+              className={classes.RoundedButton}
               variant="contained"
               size="large"
               color="primary"

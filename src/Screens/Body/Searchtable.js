@@ -42,6 +42,7 @@ const Searchtable = () => {
       
       });
     return (
+      
         <div> 
        
         <MuiPickersUtilsProvider utils={DateFnsUtils}>
@@ -78,7 +79,7 @@ const Searchtable = () => {
     
         </Grid>
         </MuiPickersUtilsProvider>
-        <Button fullWidth={true} variant="contained" color="secondary" onClick={()=>handleFilter()}>
+        <Button fullWidth={true} className={classes.RoundedButton}  variant="contained" color="secondary" onClick={()=>handleFilter()}>
             Filter
         </Button>   
         </div>

@@ -19,7 +19,7 @@ export const action_Login_user = (username, password) => async () => {
     localStorage.setItem("username", username);
     localStorage.setItem("inventory_token", parseData.access_token);
     localStorage.setItem("refreshtoken", parseData.refresh_token);
-    window.location.href = "/";
+    window.location.href = "/Dashboard";
     console.log(parseData);
   } else {
     alert("Wrong Username/Password");
